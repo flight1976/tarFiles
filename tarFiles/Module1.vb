@@ -21,26 +21,33 @@ Module Module1
             Using archive As ZipArchive = New ZipArchive(zipToOpen, ZipArchiveMode.Update)
                 For Each file As String In files
                     archive.CreateEntryFromFile(file, Path.GetFileName(file), 2)
+                    Console.Write(".")
                 Next
 
             End Using
+            Console.WriteLine()
+
         End Using
         Return True
     End Function
     Sub Main()
         Dim cmd_args() As String = Environment.GetCommandLineArgs()
-
-        If cmd_args.Count() < 4 Then
+        If cmd_args.Count() < 5 Then
             ' https://social.msdn.microsoft.com/Forums/vstudio/en-US/51379b07-7fd3-495a-b2bc-830462fe0fa1/visual-basic-console-application-with-arguments?forum=vbgeneral
             'Console.WriteLine("Usage: {0} <source dir> <destination dir> <tar file numbers>", cmd_args(0))
-            Console.WriteLine("Usage: {0} <source dir> <destination dir> <tar file numbers>", "tarFiles.exe")
+            'https://docs.microsoft.com/zh-tw/dotnet/api/microsoft.visualbasic.applicationservices.assemblyinfo?view=windowsdesktop-6.0
+            Console.WriteLine("Version: {0}", My.Application.Info.Version.ToString)
+            Console.WriteLine("Usage: {0} <source dir> <destination dir> <tar file numbers> <delete source files>", "tarFiles.exe")
             Exit Sub
         End If
 
         Dim srcDir As String = cmd_args(1)
         Dim dstDir As String = cmd_args(2)
         Dim fileNums As String = cmd_args(3)
+        Dim delSrcFiles As String = cmd_args(4)
+
         Dim num As Integer = 1000
+        Dim numDelSrcFiles As Integer = 0
 
         '檢查輸入
         If Integer.TryParse(fileNums, num) Then
@@ -52,6 +59,19 @@ Module Module1
             End If
         Else
             Console.WriteLine("<tar file numbers>輸入參數非數字")
+            Exit Sub
+        End If
+
+        If Integer.TryParse(delSrcFiles, numDelSrcFiles) Then
+            If numDelSrcFiles = 0 Then
+                Console.WriteLine("完成後刪除來源檔案: No")
+            ElseIf numDelSrcFiles = 1 Then
+                Console.WriteLine("完成後刪除來源檔案: Yes")
+            Else
+                Console.WriteLine("<delete source files> 請輸入 0 或 1")
+            End If
+        Else
+                Console.WriteLine("<delete source files> 請輸入 0 或 1")
             Exit Sub
         End If
 
@@ -121,7 +141,21 @@ Module Module1
 
             csvLogWriter.Close()
 
+            '檢查是否需刪除來源檔案
+            If numDelSrcFiles = 1 Then
 
+                '直接刪目錄 (暫不使用此方式，因files字串陣列僅搜尋*.zip檔案，若直接刪目錄可能會誤刪除未打包檔案)
+                'My.Computer.FileSystem.DeleteDirectory(srcDir, FileIO.DeleteDirectoryOption.DeleteAllContents)
+
+                '個別刪除目錄內資料
+                'https://docs.microsoft.com/zh-tw/dotnet/visual-basic/developing-apps/programming/drives-directories-files/how-to-delete-a-file
+                For Each file As String In files
+                    My.Computer.FileSystem.DeleteFile(file, FileIO.UIOption.AllDialogs, FileIO.RecycleOption.SendToRecycleBin)
+                    'System.IO.File.Delete(File)
+                    Console.WriteLine("Deleting {0}", file)
+                Next
+
+            End If
 
         Else
             Console.WriteLine("來源目錄 [{0}] 不存在或包含子目錄!!", srcDir)
