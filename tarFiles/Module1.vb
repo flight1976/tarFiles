@@ -222,25 +222,34 @@ Module Module1
                 'Next
                 tarFile(packedFileName, filesTmp, srcDir)
 
+                '每個打包檔完成後就刪除相關檔案
+                If numDelSrcFiles = 1 Then
+                    'https://docs.microsoft.com/zh-tw/dotnet/visual-basic/developing-apps/programming/drives-directories-files/how-to-delete-a-file
+                    For Each fileTmp As String In filesTmp
+                        System.IO.File.Delete(fileTmp)
+                        Console.WriteLine("Deleting {0}", fileTmp)
+                    Next
+                End If
+
             Next
 
             csvLogWriter.Close()
 
-            '檢查是否需刪除來源檔案
-            If numDelSrcFiles = 1 Then
+            '檢查是否需刪除來源檔案 (此段改到每個打包檔完成時提早執行)
+            'If numDelSrcFiles = 1 Then
 
-                '直接刪目錄 (暫不使用此方式，因files字串陣列僅搜尋*.zip檔案，若直接刪目錄可能會誤刪除未打包檔案)
-                'My.Computer.FileSystem.DeleteDirectory(srcDir, FileIO.DeleteDirectoryOption.DeleteAllContents)
+            '    '直接刪目錄 (暫不使用此方式，因files字串陣列僅搜尋*.zip檔案，若直接刪目錄可能會誤刪除未打包檔案)
+            '    'My.Computer.FileSystem.DeleteDirectory(srcDir, FileIO.DeleteDirectoryOption.DeleteAllContents)
 
-                '個別刪除目錄內資料
-                'https://docs.microsoft.com/zh-tw/dotnet/visual-basic/developing-apps/programming/drives-directories-files/how-to-delete-a-file
-                For Each file As String In files
-                    My.Computer.FileSystem.DeleteFile(file, FileIO.UIOption.AllDialogs, FileIO.RecycleOption.SendToRecycleBin)
-                    'System.IO.File.Delete(File)
-                    Console.WriteLine("Deleting {0}", file)
-                Next
+            '    '個別刪除目錄內資料
+            '    'https://docs.microsoft.com/zh-tw/dotnet/visual-basic/developing-apps/programming/drives-directories-files/how-to-delete-a-file
+            '    For Each file As String In files
+            '        'My.Computer.FileSystem.DeleteFile(file, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin)
+            '        System.IO.File.Delete(file)
+            '        Console.WriteLine("Deleting {0}", file)
+            '    Next
 
-            End If
+            'End If
 
         Else
             Console.WriteLine("來源目錄 [{0}] 不存在!!", srcDir)
