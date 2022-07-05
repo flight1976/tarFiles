@@ -59,7 +59,7 @@ Module Module1
                 'For Each aa As String In filesTmp
                 '    Console.WriteLine(aa)
                 'Next
-                tarFile(packedFileName, filesTmp)
+                tarFile(packedFileName, filesTmp, srcDir)
 
             Next
 
@@ -87,14 +87,18 @@ Module Module1
         End If
     End Sub
 
-    Function tarFile(ByVal zipSavePath As String, ByVal files() As String) As Boolean
+    Function tarFile(ByVal zipSavePath As String, ByVal files() As String, ByVal srcDir As String) As Boolean
         'https://docs.microsoft.com/zh-tw/dotnet/standard/io/how-to-compress-and-extract-files
         Using zipToOpen As FileStream = New FileStream(zipSavePath, FileMode.OpenOrCreate)
             Using archive As ZipArchive = New ZipArchive(zipToOpen, ZipArchiveMode.Update)
 
                 For Each file As String In files
                     'https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/mitigation-ziparchiveentry-fullname-path-separator
-                    archive.CreateEntryFromFile(file, Path.GetFullPath(file).Substring(3), 2)
+                    Dim tmpFilePath As String = Path.GetFullPath(file).Substring(srcDir.Length) '移除多餘目錄結構
+                    If tmpFilePath.Substring(0, 1) = "\" Then '若開頭有\, 手動移除
+                        tmpFilePath = tmpFilePath.Substring(1)
+                    End If
+                    archive.CreateEntryFromFile(file, tmpFilePath, 2)
                     'archive.CreateEntryFromFile(file, Path.GetFileName(file), 2)
                     'archive.CreateEntryFromFile(file, Path.GetFullPath(file), 2)
                     Console.Write(".")
@@ -216,7 +220,7 @@ Module Module1
                 'For Each aa As String In filesTmp
                 '    Console.WriteLine(aa)
                 'Next
-                tarFile(packedFileName, filesTmp)
+                tarFile(packedFileName, filesTmp, srcDir)
 
             Next
 
