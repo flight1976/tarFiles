@@ -207,12 +207,7 @@ Module Module1
                 Console.WriteLine(packedFileName)
                 Console.WriteLine("-----------------------------------------------------------------------------------")
 
-                '產生csv檔案清單
-                For i2 As Integer = startPos To endPos
-                    'Console.WriteLine(files(i2))
-                    csvLogWriter.WriteLine("{0},{1}", files(i2), packedFileName)
-                    sumCsvLogWriter.WriteLine("{0},{1}", files(i2), packedFileName)
-                Next
+
 
                 'https://docs.microsoft.com/en-us/dotnet/visual-basic/programming-guide/language-features/arrays/
                 Dim filesTmp(endPos - startPos) As String
@@ -221,6 +216,13 @@ Module Module1
                 '    Console.WriteLine(aa)
                 'Next
                 tarFile(packedFileName, filesTmp, srcDir)
+
+                '產生csv檔案清單
+                For i2 As Integer = startPos To endPos
+                    'Console.WriteLine(files(i2))
+                    csvLogWriter.WriteLine("{0},{1}", files(i2), packedFileName)
+                    sumCsvLogWriter.WriteLine("{0},{1}", files(i2), packedFileName)
+                Next
 
                 '每個打包檔完成後就刪除相關檔案
                 If numDelSrcFiles = 1 Then
