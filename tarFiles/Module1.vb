@@ -162,6 +162,7 @@ Module Module1
         Dim sumCsvLogWriter As System.IO.StreamWriter
         sumCsvLogWriter = My.Computer.FileSystem.OpenTextFileWriter(sumCsvFile, True)
         sumCsvLogWriter.WriteLine("原始檔案,目的檔案")
+        sumCsvLogWriter.Close()
 
 
         '建立目的目錄
@@ -188,10 +189,13 @@ Module Module1
             '建立csv log 
             csvLogWriter = My.Computer.FileSystem.OpenTextFileWriter(dstDir + "\" + csvLogFile, True)
             csvLogWriter.WriteLine("原始檔案,目的檔案")
+            csvLogWriter.Close()
 
 
             '每個打包檔流程
             For index As Integer = 1 To packedNum
+                sumCsvLogWriter = My.Computer.FileSystem.OpenTextFileWriter(sumCsvFile, True)
+                csvLogWriter = My.Computer.FileSystem.OpenTextFileWriter(dstDir + "\" + csvLogFile, True)
                 '計算檔名
                 startPos = (index - 1) * num
                 endPos = index * num - 1
@@ -223,6 +227,11 @@ Module Module1
                     csvLogWriter.WriteLine("{0},{1}", files(i2), packedFileName)
                     sumCsvLogWriter.WriteLine("{0},{1}", files(i2), packedFileName)
                 Next
+                '將buffer寫入檔案
+                csvLogWriter.Close()
+                sumCsvLogWriter.Close()
+
+
 
                 '每個打包檔完成後就刪除相關檔案
                 If numDelSrcFiles = 1 Then
@@ -235,7 +244,7 @@ Module Module1
 
             Next
 
-            csvLogWriter.Close()
+
 
             '檢查是否需刪除來源檔案 (此段改到每個打包檔完成時提早執行)
             'If numDelSrcFiles = 1 Then
